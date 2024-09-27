@@ -9,27 +9,27 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { User } from './interfaces/user.interface';
+import { IUser } from './interfaces/user.interface';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  create(@Body() user: User): User {
+  create(@Body() user: IUser): IUser {
     return this.usersService.create(user);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number): User {
+  findOne(@Param('id', ParseIntPipe) id: number): IUser {
     return this.usersService.findOne(id);
   }
 
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() user: Partial<User>,
-  ): User {
+    @Body() user: Partial<IUser>,
+  ): IUser {
     return this.usersService.update(id, user);
   }
 
@@ -39,7 +39,7 @@ export class UsersController {
   }
 
   @Get()
-  findAll(): User[] {
+  findAll(): IUser[] {
     return this.usersService.findAll();
   }
 }
