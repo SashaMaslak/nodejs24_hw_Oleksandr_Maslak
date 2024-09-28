@@ -1,5 +1,4 @@
-export interface IUser {
-  id: number;
+export class ICreateUser {
   firstName: string;
   lastName: string;
   age: number;

@@ -1,29 +1,42 @@
 import { Injectable } from '@nestjs/common';
-import { User } from './interfaces/user.interface';
+import { IUser } from './interfaces/user.interface';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { PartialUpdateUserDto } from './dto/partial-update-user.dto';
 
 @Injectable()
 export class UsersService {
-  private users: User[] = [];
+  private users: IUser[] = [];
   private idCounter = 1;
 
-  create(user: User): User {
-    const newUser = { id: this.idCounter++, ...user };
+  create(createUserDto: CreateUserDto): IUser {
+    const newUser = { id: this.idCounter++, ...createUserDto };
     this.users.push(newUser);
     return newUser;
   }
 
-  findAll(): User[] {
+  findAll(): IUser[] {
     return this.users;
   }
 
-  findOne(id: number): User {
+  findOne(id: number): IUser {
     return this.users.find((user) => user.id === id);
   }
 
-  update(id: number, user: Partial<User>): User {
+  update(id: number, updateUserDto: UpdateUserDto): IUser {
+    const existingUserIndex = this.users.findIndex((user) => user.id === id);
+    if (existingUserIndex !== -1) {
+      const updatedUser = { id, ...updateUserDto };
+      this.users[existingUserIndex] = updatedUser;
+      return updatedUser;
+    }
+    return null;
+  }
+
+  partialUpdate(id: number, partialUpdateUserDto: PartialUpdateUserDto): IUser {
     const existingUser = this.findOne(id);
     if (existingUser) {
-      Object.assign(existingUser, user);
+      Object.assign(existingUser, partialUpdateUserDto);
       return existingUser;
     }
     return null;

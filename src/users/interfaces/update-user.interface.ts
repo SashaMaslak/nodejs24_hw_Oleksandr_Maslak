@@ -1,5 +1,4 @@
-export interface IUser {
-  id: number;
+export interface IUpdateUser {
   firstName: string;
   lastName: string;
   age: number;
