@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { IUser } from './interfaces/user.interface';
+import { IUser } from './interface/user.interface';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PartialUpdateUserDto } from './dto/partial-update-user.dto';
 
 @Injectable()
-export class UsersService {
+export class UserService {
   private users: IUser[] = [];
   private idCounter = 1;
 

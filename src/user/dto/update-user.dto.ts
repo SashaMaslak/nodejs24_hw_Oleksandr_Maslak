@@ -1,5 +1,5 @@
 import { IsBoolean, IsInt, IsString, Min, Max, Length } from 'class-validator';
-import { IUpdateUser } from '../interfaces/update-user.interface';
+import { IUpdateUser } from '../interface/update-user.interface';
 
 export class UpdateUserDto implements IUpdateUser {
   @IsString()

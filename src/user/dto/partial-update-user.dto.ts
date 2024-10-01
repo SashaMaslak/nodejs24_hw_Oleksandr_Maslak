@@ -8,7 +8,7 @@ import {
   Length,
 } from 'class-validator';
 import { IPartUpdateUser } from '../interfaces/partial-update-user.interface';
-
+../interface/partial-update-user.interface
 export class PartialUpdateUserDto implements IPartUpdateUser {
   @IsOptional()
   @IsString()

@@ -9,29 +9,29 @@ import {
   ParseIntPipe,
   Put,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
+import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PartialUpdateUserDto } from './dto/partial-update-user.dto';
-import { IUser } from './interfaces/user.interface';
+import { IUser } from './interface/user.interface';
 
 @Controller('users')
-export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+export class UserController {
+  constructor(private readonly userService: UserService) {}
 
   @Get()
   findAll(): IUser[] {
-    return this.usersService.findAll();
+    return this.userService.findAll();
   }
 
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number): IUser {
-    return this.usersService.findOne(id);
+    return this.userService.findOne(id);
   }
 
   @Post()
   create(@Body() createUserDto: CreateUserDto): IUser {
-    return this.usersService.create(createUserDto);
+    return this.userService.create(createUserDto);
   }
 
   @Put(':id')
@@ -39,7 +39,7 @@ export class UsersController {
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
   ): IUser {
-    return this.usersService.update(id, updateUserDto);
+    return this.userService.update(id, updateUserDto);
   }
 
   @Patch(':id')
@@ -47,11 +47,11 @@ export class UsersController {
     @Param('id', ParseIntPipe) id: number,
     @Body() partialUpdateUserDto: PartialUpdateUserDto,
   ): IUser {
-    return this.usersService.partialUpdate(id, partialUpdateUserDto);
+    return this.userService.partialUpdate(id, partialUpdateUserDto);
   }
 
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number): void {
-    this.usersService.remove(id);
+    this.userService.remove(id);
   }
 }

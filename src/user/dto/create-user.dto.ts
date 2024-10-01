@@ -1,5 +1,5 @@
 import { IsBoolean, IsInt, IsString, Min, Max, Length } from 'class-validator';
-import { ICreateUser } from '../interfaces/create-user.interface';
+import { ICreateUser } from '../interface/create-user.interface';
 
 export class CreateUserDto implements ICreateUser {
   @IsString()
