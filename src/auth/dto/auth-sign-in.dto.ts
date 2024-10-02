@@ -1,7 +1,8 @@
 import { IsString, IsEmail, MinLength } from 'class-validator';
 import { IUser } from 'src/users/interfaces/user.interface';
+import { IUserSignIn } from '../interfaces/auth-user.interface';
 
-export class AuthSignInDto implements Pick<IUser, 'email' | 'password'> {
+export class AuthSignInDto implements IUserSignIn {
   @IsEmail()
   email: string;
 

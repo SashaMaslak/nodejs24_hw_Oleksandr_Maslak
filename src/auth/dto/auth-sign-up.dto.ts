@@ -10,10 +10,9 @@ import {
   IsOptional,
 } from 'class-validator';
 import { IUser } from 'src/users/interfaces/user.interface';
+import { IUserSignUp } from '../interfaces/auth-user.interface';
 
-export class AuthSignUpDto
-  implements Pick<IUser, 'email' | 'password' | 'firstName' | 'isStudent'>
-{
+export class AuthSignUpDto implements IUserSignUp {
   @IsEmail()
   email: string;
 

@@ -13,17 +13,8 @@ import { PartialUpdateUserDto } from './dto/partial-update-user.dto';
 export class UsersService {
   private users: IUser[] = [];
 
-  private initialUser: CreateUserDto = {
-    email: '',
-    password: '',
-    firstName: '',
-    lastName: '',
-    age: 0,
-    isStudent: false,
-  };
-
   create(dto: CreateUserDto): IUser {
-    const newUser = { id: uuidv4(), ...this.initialUser, ...dto };
+    const newUser = { id: uuidv4(), ...dto };
 
     this.users.push(newUser);
     return newUser;
