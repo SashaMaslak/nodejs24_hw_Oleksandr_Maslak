@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { IUser } from './interfaces/user.interface';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -16,34 +20,37 @@ export class UsersService {
     return newUser;
   }
 
-  // findAll(): IUser[] {
-  //   return this.users;
-  // }
+  findAll(): IUser[] {
+    return this.users;
+  }
 
-  // findById(id: number): IUser {
-  //   return this.users.find((user) => user.id === id);
-  // }
+  findById(id: string): IUser {
+    return this.users.find((user) => user.id === id);
+  }
 
-  // update(id: number, updateUserDto: UpdateUserDto): IUser {
-  //   const existingUserIndex = this.users.findIndex((user) => user.id === id);
-  //   if (existingUserIndex !== -1) {
-  //     const updatedUser = { id, ...updateUserDto };
-  //     this.users[existingUserIndex] = updatedUser;
-  //     return updatedUser;
-  //   }
-  //   return null;
-  // }
+  findByEmail(email: string): IUser {
+    return this.users.find((user) => user.email === email);
+  }
 
-  // partialUpdate(id: number, partialUpdateUserDto: PartialUpdateUserDto): IUser {
-  //   const existingUser = this.findById(id);
-  //   if (existingUser) {
-  //     Object.assign(existingUser, partialUpdateUserDto);
-  //     return existingUser;
-  //   }
-  //   return null;
-  // }
+  findByIdAndReplace(id: string, dto: UpdateUserDto): IUser {
+    const existingUserIndex = this.users.findIndex((user) => user.id === id);
+    if (!existingUserIndex) {
+      throw new NotFoundException(`User with id ${id} not found`);
+    }
+    return (this.users[existingUserIndex] = dto);
+  }
 
-  // remove(id: number): void {
-  //   this.users = this.users.filter((user) => user.id !== id);
-  // }
+  findByIdAndUpdate(id: string, dto: PartialUpdateUserDto): IUser {
+    const existingUserIndex = this.users.findIndex((user) => user.id === id);
+    if (!existingUserIndex) {
+      throw new NotFoundException(`User with id ${id} not found`);
+    }
+
+    const foundedUser = this.users[existingUserIndex];
+    return (this.users[existingUserIndex] = { ...foundedUser, ...dto });
+  }
+
+  remove(id: string): void {
+    this.users = this.users.filter((user) => user.id !== id);
+  }
 }

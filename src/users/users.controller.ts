@@ -24,15 +24,15 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-  // @Get()
-  // findAll(): IUser[] {
-  //   return this.usersService.findAll();
-  // }
+  @Get()
+  getAll(): IUser[] {
+    return this.usersService.findAll();
+  }
 
-  // @Get(':id')
-  // findOne(@Param('id', ParseIntPipe) id: number): IUser {
-  //   return this.usersService.findById(id);
-  // }
+  @Get(':id')
+  getById(@Param('id', ParseIntPipe) id: string): IUser {
+    return this.usersService.findById(id);
+  }
 
   // @Put(':id')
   // update(

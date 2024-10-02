@@ -6,28 +6,42 @@ import {
   Min,
   Max,
   Length,
+  IsEmail,
+  MinLength,
 } from 'class-validator';
 
-import { IPartUpdateUser } from '../interfaces/partial-update-user.interface';
+import { IUser } from '../interfaces/user.interface';
 
-export class PartialUpdateUserDto implements IPartUpdateUser {
+export class PartialUpdateUserDto implements Partial<Omit<IUser, 'id'>> {
+  @IsString()
+  @MinLength(12)
+  id: string;
+
+  @IsOptional()
+  @IsEmail()
+  email: string;
+
+  @IsOptional()
+  @IsString()
+  password: string;
+
   @IsOptional()
   @IsString()
   @Length(2, 30)
-  firstName?: string;
+  firstName: string;
 
   @IsOptional()
   @IsString()
   @Length(2, 30)
-  lastName?: string;
+  lastName: string;
 
   @IsOptional()
   @IsInt()
   @Min(0)
   @Max(120)
-  age?: number;
+  age: number;
 
   @IsOptional()
   @IsBoolean()
-  isStudent?: boolean;
+  isStudent: boolean;
 }

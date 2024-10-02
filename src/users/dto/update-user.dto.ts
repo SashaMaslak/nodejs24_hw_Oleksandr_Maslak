@@ -1,7 +1,26 @@
-import { IsBoolean, IsInt, IsString, Min, Max, Length } from 'class-validator';
-import { IUpdateUser } from '../interfaces/update-user.interface';
+import {
+  IsBoolean,
+  IsInt,
+  IsString,
+  Min,
+  Max,
+  Length,
+  IsEmail,
+  MinLength,
+} from 'class-validator';
+import { IUser } from '../interfaces/user.interface';
 
-export class UpdateUserDto implements IUpdateUser {
+export class UpdateUserDto implements Omit<IUser, 'id'> {
+  @IsString()
+  @MinLength(12)
+  id: string;
+
+  @IsEmail()
+  email: string;
+
+  @IsString()
+  password: string;
+
   @IsString()
   @Length(2, 30)
   firstName: string;

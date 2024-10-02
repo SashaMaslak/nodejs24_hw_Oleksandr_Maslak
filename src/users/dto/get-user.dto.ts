@@ -1,8 +1,8 @@
-import { IsNumber, Length } from 'class-validator';
-import { IGetUser } from '../interfaces/get-user.interface';
+import { IsString, MinLength } from 'class-validator';
+import { IUser } from '../interfaces/user.interface';
 
-export class GetUserInput implements IGetUser {
-  @IsNumber()
-  @Length(0, 6)
-  id: number;
+export class GetUserInput implements Pick<IUser, 'id'> {
+  @IsString()
+  @MinLength(12)
+  id: string;
 }
