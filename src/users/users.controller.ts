@@ -6,7 +6,6 @@ import {
   Body,
   Patch,
   Delete,
-  ParseIntPipe,
   Put,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
@@ -20,8 +19,13 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto): IUser {
-    return this.usersService.create(createUserDto);
+  create(@Body() dto: CreateUserDto): IUser {
+    return this.usersService.create(dto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string): void {
+    this.usersService.remove(id);
   }
 
   @Get()
@@ -30,28 +34,20 @@ export class UsersController {
   }
 
   @Get(':id')
-  getById(@Param('id', ParseIntPipe) id: string): IUser {
+  getById(@Param('id') id: string): IUser {
     return this.usersService.findById(id);
   }
 
-  // @Put(':id')
-  // update(
-  //   @Param('id', ParseIntPipe) id: number,
-  //   @Body() updateUserDto: UpdateUserDto,
-  // ): IUser {
-  //   return this.usersService.update(id, updateUserDto);
-  // }
+  @Put(':id')
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto): IUser {
+    return this.usersService.findByIdAndReplace(id, updateUserDto);
+  }
 
-  // @Patch(':id')
-  // partialUpdate(
-  //   @Param('id', ParseIntPipe) id: number,
-  //   @Body() partialUpdateUserDto: PartialUpdateUserDto,
-  // ): IUser {
-  //   return this.usersService.partialUpdate(id, partialUpdateUserDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id', ParseIntPipe) id: number): void {
-  //   this.usersService.remove(id);
-  // }
+  @Patch(':id')
+  partialUpdate(
+    @Param('id') id: string,
+    @Body() partialUpdateUserDto: PartialUpdateUserDto,
+  ): IUser {
+    return this.usersService.findByIdAndUpdate(id, partialUpdateUserDto);
+  }
 }

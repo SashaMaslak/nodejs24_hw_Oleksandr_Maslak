@@ -19,6 +19,7 @@ export class UpdateUserDto implements Omit<IUser, 'id'> {
   email: string;
 
   @IsString()
+  @MinLength(6)
   password: string;
 
   @IsString()

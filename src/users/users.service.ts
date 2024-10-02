@@ -13,11 +13,24 @@ import { PartialUpdateUserDto } from './dto/partial-update-user.dto';
 export class UsersService {
   private users: IUser[] = [];
 
+  private initialUser: CreateUserDto = {
+    email: '',
+    password: '',
+    firstName: '',
+    lastName: '',
+    age: 0,
+    isStudent: false,
+  };
+
   create(dto: CreateUserDto): IUser {
-    const newUser = { id: uuidv4(), ...dto };
+    const newUser = { id: uuidv4(), ...this.initialUser, ...dto };
 
     this.users.push(newUser);
     return newUser;
+  }
+
+  remove(id: string): void {
+    this.users = this.users.filter((user) => user.id !== id);
   }
 
   findAll(): IUser[] {
@@ -46,11 +59,7 @@ export class UsersService {
       throw new NotFoundException(`User with id ${id} not found`);
     }
 
-    const foundedUser = this.users[existingUserIndex];
-    return (this.users[existingUserIndex] = { ...foundedUser, ...dto });
-  }
-
-  remove(id: string): void {
-    this.users = this.users.filter((user) => user.id !== id);
+    const foundUser = this.users[existingUserIndex];
+    return (this.users[existingUserIndex] = { ...foundUser, ...dto });
   }
 }

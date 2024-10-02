@@ -23,6 +23,7 @@ export class PartialUpdateUserDto implements Partial<Omit<IUser, 'id'>> {
 
   @IsOptional()
   @IsString()
+    @MinLength(6)
   password: string;
 
   @IsOptional()
