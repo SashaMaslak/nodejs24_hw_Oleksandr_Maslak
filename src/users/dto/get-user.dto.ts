@@ -1,5 +1,5 @@
 import { IsNumber, Length } from 'class-validator';
-import { IGetUser } from '../interface/get-user.interface';
+import { IGetUser } from '../interfaces/get-user.interface';
 
 export class GetUserInput implements IGetUser {
   @IsNumber()
