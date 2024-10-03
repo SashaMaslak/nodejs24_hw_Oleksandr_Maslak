@@ -7,6 +7,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import { verify, hash } from 'argon2';
 import { UsersService } from '../users/users.service';
 import { AuthSignUpDto } from './dto/auth-sign-up.dto';
@@ -27,7 +28,8 @@ export class AuthService {
   };
 
   constructor(
-    private jwt: JwtService,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
     private usersService: UsersService,
   ) {}
 
@@ -35,16 +37,33 @@ export class AuthService {
     return await hash(data);
   }
 
-  private async getTokens(userId: string) {
+  private async getTokens(userId: string, email: string) {
     const data = { id: userId };
 
-    const accessToken = await this.hashData(
-      this.jwt.sign(data, { expiresIn: '1h' }),
-    );
-
-    const refreshToken = await this.hashData(
-      this.jwt.sign(data, { expiresIn: '7d' }),
-    );
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(
+        {
+          sub: userId,
+          email,
+        },
+        {
+          secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+          expiresIn: this.configService.get<string>('JWT_ACCESS_SECRET_EXPIRE'),
+        },
+      ),
+      this.jwtService.signAsync(
+        {
+          sub: userId,
+          email,
+        },
+        {
+          secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+          expiresIn: this.configService.get<string>(
+            'JWT_REFRESH_SECRET_EXPIRE',
+          ),
+        },
+      ),
+    ]);
 
     return { accessToken, refreshToken };
   }
@@ -62,14 +81,14 @@ export class AuthService {
     const refreshTokenMatches = await verify(user.refreshToken, refreshToken);
     if (!refreshTokenMatches) throw new ForbiddenException('Access denied');
 
-    await this.updateRefreshToken(user.id, tokens.refreshToken);
+    await this.refreshTokens(user.id, tokens.refreshToken);
 
-    tokens = await this.getTokens(user.id);
+    tokens = await this.getTokens(user.id, user.email);
 
     return tokens;
   }
 
-  async updateRefreshToken(userId: string, refreshToken: string) {
+  async refreshTokens(userId: string, refreshToken: string) {
     const hashedRefreshToken = await this.hashData(refreshToken);
 
     const updateUserDto: PartialUpdateUserDto = {
@@ -96,7 +115,7 @@ export class AuthService {
       password: hashedPassword,
     });
 
-    tokens = await this.getTokens(newUser.id);
+    tokens = await this.getTokens(newUser.id, newUser.email);
 
     this.logger.log(`Going to sign UP new user with id: ${newUser.email}`);
 
@@ -119,7 +138,7 @@ export class AuthService {
     let tokens = { accessToken: '', refreshToken: '' };
     const user = await this.validateUser(body);
 
-    tokens = await this.getTokens(user.id);
+    tokens = await this.getTokens(user.id, user.email);
 
     this.logger.log(`Going to sign IN new user with id: ${user.email}`);
 
