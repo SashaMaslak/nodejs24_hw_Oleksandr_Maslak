@@ -18,4 +18,10 @@ export class AuthController {
   signIn(@Body() dto: AuthSignInDto) {
     return this.authService.signIn(dto);
   }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('logout')
+  signOut(@Body() dto: string) {
+    return this.authService.logOut(dto);
+  }
 }

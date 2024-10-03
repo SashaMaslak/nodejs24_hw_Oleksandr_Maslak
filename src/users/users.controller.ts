@@ -18,16 +18,6 @@ import { IUser } from './interfaces/user.interface';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
-  create(@Body() dto: CreateUserDto): IUser {
-    return this.usersService.create(dto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string): void {
-    this.usersService.remove(id);
-  }
-
   @Get()
   getAll(): IUser[] {
     return this.usersService.findAll();
@@ -49,5 +39,10 @@ export class UsersController {
     @Body() partialUpdateUserDto: PartialUpdateUserDto,
   ): IUser {
     return this.usersService.findByIdAndUpdate(id, partialUpdateUserDto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string): void {
+    this.usersService.remove(id);
   }
 }
