@@ -1,7 +1,6 @@
 import {
   Controller,
   Get,
-  Post,
   Param,
   Body,
   Patch,
@@ -9,7 +8,7 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
+import { AccessTokenGuard } from '../auth/guards/access-token.guard';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PartialUpdateUserDto } from './dto/partial-update-user.dto';

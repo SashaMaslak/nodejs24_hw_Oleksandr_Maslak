@@ -13,8 +13,8 @@ import { UsersService } from '../users/users.service';
 import { AuthSignUpDto } from './dto/auth-sign-up.dto';
 import { AuthSignInDto } from './dto/auth-sign-in.dto';
 import { ITokens } from './interfaces/tokens.interface';
-import { CreateUserDto } from 'src/users/dto/create-user.dto';
-import { PartialUpdateUserDto } from 'src/users/dto/partial-update-user.dto';
+import { CreateUserDto } from '../users/dto/create-user.dto';
+import { PartialUpdateUserDto } from '../users/dto//partial-update-user.dto';
 
 @Injectable()
 export class AuthService {

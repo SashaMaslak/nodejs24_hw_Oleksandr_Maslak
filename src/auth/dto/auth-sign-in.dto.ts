@@ -1,6 +1,5 @@
 import { IsString, IsEmail, MinLength } from 'class-validator';
-import { IUser } from 'src/users/interfaces/user.interface';
-import { IUserSignIn } from '../interfaces/auth-user.interface';
+import { IUserSignIn } from '../interfaces/auth-signin.interface';
 
 export class AuthSignInDto implements IUserSignIn {
   @IsEmail()

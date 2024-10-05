@@ -9,8 +9,7 @@ import {
   IsBoolean,
   IsOptional,
 } from 'class-validator';
-import { IUser } from 'src/users/interfaces/user.interface';
-import { IUserSignUp } from '../interfaces/auth-user.interface';
+import { IUserSignUp } from '../interfaces/auth-signup.interface';
 
 export class AuthSignUpDto implements IUserSignUp {
   @IsEmail()
