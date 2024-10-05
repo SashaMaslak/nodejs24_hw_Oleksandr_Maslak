@@ -1,15 +1,17 @@
 import {
-  IsBoolean,
-  IsInt,
   IsString,
+  IsEmail,
+  MinLength,
+  Length,
+  IsInt,
   Min,
   Max,
-  Length,
-  IsEmail,MinLength
+  IsBoolean,
+  IsOptional,
 } from 'class-validator';
-import { IUser } from '../interfaces/user.interface';
+import { IUserSignUp } from '../interfaces/auth-signup.interface';
 
-export class CreateUserDto implements Omit<IUser, 'id'> {
+export class AuthSignUpDto implements IUserSignUp {
   @IsEmail()
   email: string;
 
@@ -21,10 +23,12 @@ export class CreateUserDto implements Omit<IUser, 'id'> {
   @Length(2, 30)
   firstName: string;
 
+  @IsOptional()
   @IsString()
   @Length(2, 30)
   lastName: string;
 
+  @IsOptional()
   @IsInt()
   @Min(0)
   @Max(120)
