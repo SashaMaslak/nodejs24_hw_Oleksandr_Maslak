@@ -14,7 +14,7 @@ import { AuthSignUpDto } from './dto/auth-sign-up.dto';
 import { AuthSignInDto } from './dto/auth-sign-in.dto';
 import { ITokens } from './interfaces/tokens.interface';
 import { CreateUserDto } from '../users/dto/create-user.dto';
-import { PartialUpdateUserDto } from '../users/dto//partial-update-user.dto';
+import { PartialUpdateUserDto } from '../users/dto/partial-update-user.dto';
 
 @Injectable()
 export class AuthService {
