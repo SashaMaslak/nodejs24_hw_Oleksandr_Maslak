@@ -14,6 +14,7 @@ import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PartialUpdateUserDto } from './dto/partial-update-user.dto';
 import { User } from './schemas/user.schema';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Controller('users')
 export class UsersController {
@@ -68,9 +69,19 @@ export class UsersController {
   @UseGuards(AccessTokenGuard)
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<void> {
-    const user = await this.usersService.remove(id);
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
-    }
+    await this.usersService.remove(id);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Patch(':id/change-password')
+  async changePassword(
+    @Param('id') id: string,
+    @Body() changePasswordDto: ChangePasswordDto,
+  ): Promise<User> {
+    const updatedUser = await this.usersService.changePassword(
+      id,
+      changePasswordDto.newPassword,
+    );
+    return updatedUser;
   }
 }

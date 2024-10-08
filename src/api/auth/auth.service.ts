@@ -97,15 +97,12 @@ export class AuthService {
     }
 
     const { password, ...data } = body;
-    const hashedPassword = await this.hashData(password);
 
     const newUser: User = await this.usersService.create({
       ...this.initialUser,
       ...data,
-      password: hashedPassword,
+      password,
     });
-
-    const tokens = await this.getTokens(newUser.id, newUser.email);
 
     this.logger.log(`Going to sign UP new user with id: ${newUser.email}`);
 
