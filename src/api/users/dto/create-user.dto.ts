@@ -5,7 +5,9 @@ import {
   Min,
   Max,
   Length,
-  IsEmail,MinLength
+  IsEmail,
+  MinLength,
+  IsOptional,
 } from 'class-validator';
 import { IUser } from '../interfaces/user.interface';
 
