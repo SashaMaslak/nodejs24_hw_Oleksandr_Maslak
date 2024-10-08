@@ -15,6 +15,7 @@ import { AuthSignInDto } from './dto/auth-sign-in.dto';
 import { ITokens } from './interfaces/tokens.interface';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { PartialUpdateUserDto } from '../users/dto/partial-update-user.dto';
+import { User } from '../users/schemas/user.schema';
 
 @Injectable()
 export class AuthService {
@@ -30,7 +31,7 @@ export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-    private usersService: UsersService,
+    private readonly usersService: UsersService,
   ) {}
 
   private async hashData(data: string): Promise<string> {
@@ -42,20 +43,14 @@ export class AuthService {
 
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
-        {
-          sub: userId,
-          email,
-        },
+        { sub: userId, email },
         {
           secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
           expiresIn: this.configService.get<string>('JWT_ACCESS_SECRET_EXPIRE'),
         },
       ),
       this.jwtService.signAsync(
-        {
-          sub: userId,
-          email,
-        },
+        { sub: userId, email },
         {
           secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
           expiresIn: this.configService.get<string>(
@@ -71,9 +66,7 @@ export class AuthService {
   async getNewTokens(userId: string, refreshToken: string): Promise<ITokens> {
     this.logger.log(`Going to generate tokens for user with id: ${userId}`);
 
-    let tokens = { accessToken: '', refreshToken: '' };
-
-    const user = this.usersService.findById(userId);
+    const user = await this.usersService.findById(userId);
 
     if (!user || !user.refreshToken)
       throw new ForbiddenException('Access denied');
@@ -81,10 +74,9 @@ export class AuthService {
     const refreshTokenMatches = await verify(user.refreshToken, refreshToken);
     if (!refreshTokenMatches) throw new ForbiddenException('Access denied');
 
-    await this.refreshTokens(user.id, tokens.refreshToken);
+    await this.refreshTokens(user.id.toString(), refreshToken);
 
-    tokens = await this.getTokens(user.id, user.email);
-
+    const tokens = await this.getTokens(user.id.toString(), user.email);
     return tokens;
   }
 
@@ -95,35 +87,33 @@ export class AuthService {
       refreshToken: hashedRefreshToken,
     };
 
-    this.usersService.findByIdAndUpdate(userId, updateUserDto);
+    await this.usersService.findByIdAndUpdate(userId, updateUserDto);
   }
 
-  public async signUp(body: AuthSignUpDto): Promise<ITokens> {
-    let tokens = { accessToken: '', refreshToken: '' };
-
-    const user = this.usersService.findById(body.email);
-    if (user) {
+  public async signUp(body: AuthSignUpDto): Promise<User> {
+    const existingUser = await this.usersService.findByEmail(body.email);
+    if (existingUser) {
       throw new BadRequestException('User already exists');
     }
 
     const { password, ...data } = body;
     const hashedPassword = await this.hashData(password);
 
-    const newUser = this.usersService.create({
+    const newUser: User = await this.usersService.create({
       ...this.initialUser,
       ...data,
       password: hashedPassword,
     });
 
-    tokens = await this.getTokens(newUser.id, newUser.email);
+    const tokens = await this.getTokens(newUser.id, newUser.email);
 
     this.logger.log(`Going to sign UP new user with id: ${newUser.email}`);
 
-    return tokens;
+    return await this.usersService.findById(newUser.id);
   }
 
   private async validateUser(candidate: AuthSignInDto) {
-    const user = this.usersService.findByEmail(candidate.email);
+    const user = await this.usersService.findByEmail(candidate.email);
 
     if (!user) throw new NotFoundException('User not found');
 
@@ -134,18 +124,24 @@ export class AuthService {
     return user;
   }
 
-  public async signIn(body: AuthSignInDto): Promise<ITokens> {
-    let tokens = { accessToken: '', refreshToken: '' };
-    const user = await this.validateUser(body);
+  public async signIn(body: AuthSignInDto): Promise<User> {
+    const candidate = await this.validateUser(body);
+    const tokens = await this.getTokens(candidate.id, candidate.email);
+    try {
+      const user = await this.usersService.findByIdAndUpdate(candidate.id, {
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+      });
+      this.logger.log(`Going to sign IN user with id: ${user.id}`);
 
-    tokens = await this.getTokens(user.id, user.email);
-
-    this.logger.log(`Going to sign IN new user with id: ${user.email}`);
-
-    return tokens;
+      return await this.usersService.findById(user.id);
+    } catch (error) {
+      return error;
+    }
   }
 
   async logOut(userId: string) {
-    return this.usersService.findByIdAndUpdate(userId, { refreshToken: '' });
+    this.logger.log(`Going to Log Out user with id: ${userId}`);
+    await this.usersService.findByIdAndUpdate(userId, { refreshToken: '' });
   }
 }

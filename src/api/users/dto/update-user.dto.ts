@@ -6,21 +6,13 @@ import {
   Max,
   Length,
   IsEmail,
-  MinLength,
+  IsOptional,
 } from 'class-validator';
 import { IUser } from '../interfaces/user.interface';
 
-export class UpdateUserDto implements Omit<IUser, 'id'> {
-  @IsString()
-  @MinLength(12)
-  id: string;
-
+export class UpdateUserDto implements Omit<IUser, 'id' | 'password'> {
   @IsEmail()
   email: string;
-
-  @IsString()
-  @MinLength(6)
-  password: string;
 
   @IsString()
   @Length(2, 30)
