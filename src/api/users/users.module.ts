@@ -7,7 +7,7 @@ import { AbstractDbModule } from '../../database/abstract-db.module';
 
 @Module({
   imports: [
-    AbstractDbModule.register({ uri: process.env.MONGO_URI, type: 'mongodb' }),
+    AbstractDbModule.register(),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
   controllers: [UsersController],
