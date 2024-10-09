@@ -1,26 +1,40 @@
-import { Module, DynamicModule, Global, Logger } from '@nestjs/common';
+import { DynamicModule, Global, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Global()
 @Module({})
 export class AbstractDbModule {
-  static register(uri: string): DynamicModule {
-    return {
-      module: AbstractDbModule,
-      imports: [
-        ConfigModule.forRoot({
-          isGlobal: true,
-        }),
-        MongooseModule.forRoot(uri, {
+  static register(options: {
+    uri: string;
+    type: 'mongodb' | 'postgresql';
+  }): DynamicModule {
+    const imports = [];
+
+    if (options.type === 'mongodb') {
+      imports.push(
+        MongooseModule.forRoot(options.uri, {
           connectionFactory: (connection) => {
-            const logger = new Logger('MongoDB');
-            logger.log('MongoDB connected successfully');
+            console.log('MongoDB connected successfully');
             return connection;
           },
         }),
-      ],
-      exports: [MongooseModule],
+      );
+    } else if (options.type === 'postgresql') {
+      imports.push(
+        TypeOrmModule.forRoot({
+          type: 'postgres',
+          url: options.uri,
+          synchronize: true,
+          autoLoadEntities: true,
+        }),
+      );
+    }
+
+    return {
+      module: AbstractDbModule,
+      imports,
+      exports: imports,
     };
   }
 }
