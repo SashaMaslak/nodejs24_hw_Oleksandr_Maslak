@@ -24,15 +24,4 @@ export class MongoDbService {
   async findOne(query: any): Promise<UserDocument | null> {
     return this.userModel.findOne(query).exec();
   }
-
-  async updateOne(
-    id: string,
-    update: Partial<User>,
-  ): Promise<UserDocument | null> {
-    return this.userModel.findByIdAndUpdate(id, update, { new: true }).exec();
-  }
-
-  async deleteOne(id: string): Promise<UserDocument | null> {
-    return this.userModel.findByIdAndDelete(id).exec();
-  }
 }
