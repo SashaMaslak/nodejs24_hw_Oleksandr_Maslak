@@ -10,18 +10,29 @@ export class MongoDbService {
   ) {}
 
   async connect(): Promise<void> {
-    // Логіка підключення (необов'язкова)
+    console.log('Connected to MongoDB');
   }
 
   async disconnect(): Promise<void> {
-    // Логіка відключення (необов'язкова)
+    console.log('Disconnected from MongoDB');
   }
 
-  async insertOne(data: User): Promise<void> {
-    await this.userModel.create(data); // Збереження нового користувача
+  async insertOne(data: User): Promise<User> {
+    return await this.userModel.create(data);
   }
 
   async findOne(query: any): Promise<UserDocument | null> {
-    return this.userModel.findOne(query).exec(); // Пошук користувача
+    return this.userModel.findOne(query).exec();
+  }
+
+  async updateOne(
+    id: string,
+    update: Partial<User>,
+  ): Promise<UserDocument | null> {
+    return this.userModel.findByIdAndUpdate(id, update, { new: true }).exec();
+  }
+
+  async deleteOne(id: string): Promise<UserDocument | null> {
+    return this.userModel.findByIdAndDelete(id).exec();
   }
 }
