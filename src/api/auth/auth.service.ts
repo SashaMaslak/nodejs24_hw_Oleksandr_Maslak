@@ -87,7 +87,7 @@ export class AuthService {
       refreshToken: hashedRefreshToken,
     };
 
-    await this.usersService.findByIdAndUpdate(userId, updateUserDto);
+    await this.usersService.partialUpdate(userId, updateUserDto);
   }
 
   public async signUp(body: AuthSignUpDto): Promise<User> {
@@ -128,7 +128,7 @@ export class AuthService {
     const candidate = await this.validateUser(body);
     const tokens = await this.getTokens(candidate.id, candidate.email);
     try {
-      const user = await this.usersService.findByIdAndUpdate(candidate.id, {
+      const user = await this.usersService.partialUpdate(candidate.id, {
         accessToken: tokens.accessToken,
         refreshToken: tokens.refreshToken,
       });
@@ -142,6 +142,6 @@ export class AuthService {
 
   async logOut(userId: string) {
     this.logger.log(`Going to Log Out user with id: ${userId}`);
-    await this.usersService.findByIdAndUpdate(userId, { refreshToken: '' });
+    await this.usersService.partialUpdate(userId, { refreshToken: '' });
   }
 }

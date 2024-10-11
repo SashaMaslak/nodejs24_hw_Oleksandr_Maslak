@@ -39,10 +39,7 @@ export class UsersController {
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<User> {
-    const updatedUser = await this.usersService.findByIdAndReplace(
-      id,
-      updateUserDto,
-    );
+    const updatedUser = await this.usersService.update(id, updateUserDto);
     if (!updatedUser) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
@@ -55,7 +52,7 @@ export class UsersController {
     @Param('id') id: string,
     @Body() partialUpdateUserDto: PartialUpdateUserDto,
   ): Promise<User> {
-    const updatedUser = await this.usersService.findByIdAndUpdate(
+    const updatedUser = await this.usersService.partialUpdate(
       id,
       partialUpdateUserDto,
     );
@@ -67,10 +64,7 @@ export class UsersController {
 
   @UseGuards(AccessTokenGuard)
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<void> {
-    const user = await this.usersService.remove(id);
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
-    }
+  async remove(@Param('id') id: string): Promise<User> {
+    return await this.usersService.remove(id);
   }
 }

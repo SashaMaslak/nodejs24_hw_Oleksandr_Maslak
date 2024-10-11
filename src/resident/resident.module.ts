@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { UsersController } from './users.controller';
-import { UsersRepository } from './users.repository';
+import { ResidentService } from './resident.service';
+import { ResidentController } from './resident.controller';
+import { ResidentRepository } from './resident.repository';
 import { DatabaseAbstractionModule } from 'src/database-abstraction/database-abstraction.module';
 import { DBType } from 'src/database-abstraction/types/enums/database-type.enum';
 import { DatabaseModule } from 'src/database/database.module';
 
 @Module({
   imports: [DatabaseModule, DatabaseAbstractionModule.register(DBType.MONGODB)],
-  controllers: [UsersController],
-  providers: [UsersService, UsersRepository],
-  exports: [UsersService],
+  controllers: [ResidentController],
+  providers: [ResidentService, ResidentRepository],
+  exports: [ResidentService],
 })
-export class UsersModule {}
+export class ResidentModule {}

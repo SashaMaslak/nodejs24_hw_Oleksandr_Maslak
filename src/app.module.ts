@@ -1,28 +1,48 @@
 import { Module, Logger, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { UsersModule } from './api/users/users.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { configuration } from './config/configuration';
+import { validationSchema } from './config/validation';
+import { ResidentModule } from './resident/resident.module';
+import { ThrottlerModule, ThrottlerModuleOptions } from '@nestjs/throttler';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
+import { RequestTimerMiddleware } from './common/middleware/request-timer.middleware';
 import { AuthModule } from './api/auth/auth.module';
-import { MongooseModule } from '@nestjs/mongoose';
-import { LogIpMiddleware } from './middleware/log-ip.middleware';
+import { DatabaseModule } from './database/database.module';
+import { HttpModule } from '@nestjs/axios';
+import { LogIpMiddleware } from './common/middleware/log-ip.middleware';
 
 @Module({
   imports: [
+    HttpModule,
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: '.env',
+      load: [configuration],
+      validationSchema,
     }),
-    MongooseModule.forRoot(process.env.MONGO_URI, {
-      connectionFactory: (connection) => {
-        const logger = new Logger('MongoDB');
-        logger.log('MongoDB connected successfully');
-        return connection;
-      },
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) =>
+        ({
+          ttl: config.get('application.throttlerTTL'),
+          limit: config.get('application.throttlerLimit'),
+        }) as unknown as ThrottlerModuleOptions,
     }),
     UsersModule,
-    AuthModule,
+    DatabaseModule,
+  ],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
   ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LogIpMiddleware).forRoutes('*');
+    consumer.apply(LogIpMiddleware, RequestTimerMiddleware).forRoutes('*');
   }
 }
