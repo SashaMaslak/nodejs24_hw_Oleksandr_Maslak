@@ -14,6 +14,7 @@ import { AuthService } from './auth.service';
 import { AuthSignUpDto } from './dto/auth-sign-up.dto';
 import { AuthSignInDto } from './dto/auth-sign-in.dto';
 import { AuthLogoutDto } from './dto/auth-log-out.dto';
+import { User } from 'src/database-abstraction/models/user.model';
 
 @Controller('auth')
 export class AuthController {
@@ -21,28 +22,28 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('register')
-  signUp(@Body() dto: AuthSignUpDto) {
+  async signUp(@Body() dto: AuthSignUpDto): Promise<User> {
     return this.authService.signUp(dto);
   }
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  signIn(@Body() dto: AuthSignInDto) {
+  async signIn(@Body() dto: AuthSignInDto): Promise<User> {
     return this.authService.signIn(dto);
   }
 
   @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.OK)
   @Post('logout')
-  signOut(@Body() dto: AuthLogoutDto) {
-    return this.authService.logOut(dto.id);
+  async signOut(@Body() dto: AuthLogoutDto): Promise<void> {
+    await this.authService.logOut(dto.id);
   }
 
   @UseGuards(RefreshTokenGuard)
   @Post('refresh')
-  refreshTokens(@Req() req: Request) {
-    const userId = req.user['sub'];
-    const refreshToken = req.user['refreshToken'];
-    return this.authService.refreshTokens(userId, refreshToken);
+  async refreshTokens(@Req() req: Request): Promise<void> {
+    const userId = req.user?.sub; // Використання optional chaining для уникнення помилки
+    const refreshToken = req.user?.refreshToken; // Використання optional chaining
+    this.authService.refreshTokens(userId, refreshToken);
   }
 }

@@ -3,7 +3,8 @@ import {
   Schema as SchemaDecorator,
   SchemaFactory,
 } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, model, Model } from 'mongoose';
+import mongoose from 'mongoose';
 
 @SchemaDecorator({ timestamps: true, versionKey: false })
 export class User {
@@ -38,6 +39,8 @@ export class User {
 export type UserDocument = User & Document;
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+export const UserModel = mongoose.model('User', UserSchema);
 
 UserSchema.pre<UserDocument>('save', function () {
   this.id = this._id.toString();
