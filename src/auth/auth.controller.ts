@@ -42,8 +42,8 @@ export class AuthController {
   @UseGuards(RefreshTokenGuard)
   @Post('refresh')
   async refreshTokens(@Req() req: Request): Promise<void> {
-    const userId = req.user?.sub; // Використання optional chaining для уникнення помилки
-    const refreshToken = req.user?.refreshToken; // Використання optional chaining
+    const userId = req.user?.sub;
+    const refreshToken = req.user?.refreshToken;
     this.authService.refreshTokens(userId, refreshToken);
   }
 }

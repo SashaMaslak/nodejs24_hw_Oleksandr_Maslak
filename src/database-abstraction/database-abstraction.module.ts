@@ -3,8 +3,6 @@ import { DBType } from './types/enums/database-type.enum';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { createDatabaseService } from './factory/database-service.factory';
 import { IAbstractDatabaseService } from './types/database-abstract-service.interface';
-import { MongooseModule } from '@nestjs/mongoose'; // Додано
-import { User, UserSchema } from './models/user.model'; // Імпортуйте вашу модель
 
 @Module({})
 export class DatabaseAbstractionModule {

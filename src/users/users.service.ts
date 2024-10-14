@@ -1,11 +1,6 @@
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
-import {
-  ICityPopulationCount,
-  IUsersData,
-} from './interfaces/users-data.interface';
 import { IAbstractDatabaseService } from '../database-abstraction/types/database-abstract-service.interface';
-import { PostgresEntityMapEnum } from '../database-abstraction/types/enums/postgres-entity-map.enum';
 import { MongooseModelsMapEnum } from 'src/database-abstraction/types/enums/mngodb-model-map.enum';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from 'src/database-abstraction/models/user.model';
@@ -17,8 +12,8 @@ export class UsersService {
   private readonly logger = new Logger(UsersService.name);
 
   constructor(
-    private readonly usersRepository: UsersRepository, // для статичної бази даних
-    @Inject('DATABASE_CONNECTION') private dbService: IAbstractDatabaseService, // динамічний абстрактний варіант
+    private readonly usersRepository: UsersRepository,
+    @Inject('DATABASE_CONNECTION') private dbService: IAbstractDatabaseService,
   ) {}
 
   async findOne(id: string): Promise<User> {
@@ -62,11 +57,13 @@ export class UsersService {
 
   async findByIdAndReplace(id: string, dto: UpdateUserDto): Promise<User> {
     this.logger.log(`Replacing user with ID: ${id}`);
+
     const updatedUser = await this.dbService.findByIdAndReplace(
       MongooseModelsMapEnum.USER,
       id,
       dto,
     );
+
     return updatedUser;
   }
 

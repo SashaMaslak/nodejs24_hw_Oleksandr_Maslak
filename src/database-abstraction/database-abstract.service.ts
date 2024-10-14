@@ -9,8 +9,6 @@ export abstract class AbstractDatabaseService
   abstract insertOne(table: string, data: any): Promise<User>;
   abstract findOne(table: string, query: any): Promise<any>;
   abstract findAll(table: any): Promise<any[]>;
-
-  // Додаємо нові методи
   abstract remove(table: string, id: string): Promise<any>;
   abstract findById(table: string, id: string): Promise<any>;
   abstract findByEmail(table: string, email: string): Promise<any | null>;

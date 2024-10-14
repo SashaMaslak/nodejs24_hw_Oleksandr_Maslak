@@ -92,7 +92,7 @@ export class MongoDatabaseService extends AbstractDatabaseService {
     }
 
     const updatedUser = await model
-      .findByIdAndUpdate(id, { ...existingUser, ...dto }, { new: true })
+      .findByIdAndUpdate(id, dto, { new: true })
       .exec();
     return updatedUser;
   }
@@ -103,6 +103,7 @@ export class MongoDatabaseService extends AbstractDatabaseService {
     dto: PartialUpdateUserDto,
   ): Promise<any> {
     const model = this.getModel(table);
+
     const existingUser = await model.findById(id).exec();
 
     if (!existingUser) {
@@ -112,6 +113,7 @@ export class MongoDatabaseService extends AbstractDatabaseService {
     const updatedUser = await model
       .findByIdAndUpdate(id, dto, { new: true })
       .exec();
+
     return updatedUser;
   }
 

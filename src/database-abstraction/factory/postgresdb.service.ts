@@ -42,10 +42,10 @@ export class PostgresDatabaseService extends AbstractDatabaseService {
     const entity = this.getEntity(table);
     const repository = this.dataSource.getRepository(entity);
 
-    const newUser = repository.create(data); // створюємо нового користувача
-    const savedUser = await repository.save(newUser); // зберігаємо користувача
+    const newUser = repository.create(data);
+    const savedUser = await repository.save(newUser);
 
-    return savedUser; // повертаємо збереженого користувача
+    return savedUser;
   }
 
   async findOne(table: PostgresEntityMapEnum, query: any): Promise<any> {

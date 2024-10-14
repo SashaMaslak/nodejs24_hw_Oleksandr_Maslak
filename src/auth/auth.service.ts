@@ -41,8 +41,6 @@ export class AuthService {
   }
 
   private async getTokens(userId: string, email: string) {
-    const data = { id: userId };
-
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         { sub: userId, email },
@@ -120,8 +118,6 @@ export class AuthService {
       },
     );
 
-    const tokens = await this.getTokens(newUser.id, newUser.email);
-
     this.logger.log(`Going to sign UP new user with id: ${newUser.email}`);
 
     return newUser;
@@ -144,20 +140,28 @@ export class AuthService {
 
   public async signIn(body: AuthSignInDto): Promise<User> {
     const candidate = await this.validateUser(body);
-    this.logger.log(`77777777`);
-    const tokens = await this.getTokens(candidate.id, candidate.email);
+
+    const tokens = await this.getTokens(
+      candidate._id.toString(),
+      candidate.email,
+    );
+
     try {
       const user = await this.dbService.findByIdAndUpdate(
         MongooseModelsMapEnum.USER,
-        candidate.id,
+        candidate._id.toString(),
         {
           accessToken: tokens.accessToken,
           refreshToken: tokens.refreshToken,
         },
       );
-      this.logger.log(`Going to sign IN user with id: ${user.id}`);
 
-      return await this.dbService.findById(MongooseModelsMapEnum.USER, user.id);
+      this.logger.log(`Going to sign IN user with id: ${user._id.toString()}`);
+
+      return await this.dbService.findById(
+        MongooseModelsMapEnum.USER,
+        user._id,
+      );
     } catch (error) {
       return error;
     }
