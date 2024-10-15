@@ -13,6 +13,7 @@ import { RequestTimerMiddleware } from './common/middleware/request-timer.middle
 import { DatabaseModule } from './database/database.module';
 import { HttpModule } from '@nestjs/axios';
 import { AuthModule } from './auth/auth.module';
+import { FileModule } from './file/file.module';
 
 
 @Module({
@@ -36,6 +37,7 @@ import { AuthModule } from './auth/auth.module';
     UsersModule,
     AuthModule,
     DatabaseModule,
+    FileModule,
   ],
   controllers: [AppController],
   providers: [
