@@ -9,9 +9,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors();
-
   app.useGlobalFilters(new HttpExceptionFilter());
-
   app.useGlobalPipes(
     new ValidationPipe({
       stopAtFirstError: false,
@@ -20,6 +18,7 @@ async function bootstrap() {
   );
 
   app.enableShutdownHooks();
+
 
   const configService = app.get(ConfigService);
 
@@ -36,5 +35,6 @@ async function bootstrap() {
   }
 
   await app.listen(configService.get<number>('application.port'));
+
 }
 bootstrap();
