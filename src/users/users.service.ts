@@ -6,6 +6,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { User } from 'src/database-abstraction/models/user.model';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PartialUpdateUserDto } from './dto/partial-update-user.dto';
+import { GetUserDto } from './dto/get-user.dto';
 
 @Injectable()
 export class UsersService {

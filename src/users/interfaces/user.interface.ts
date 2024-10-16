@@ -3,8 +3,8 @@ export interface IUser {
   email: string;
   password: string;
   firstName: string;
-  lastName: string;
-  age: number;
+  lastName?: string;
+  age?: number;
   isStudent: boolean;
   accessToken?: string;
   refreshToken?: string;
