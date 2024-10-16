@@ -52,11 +52,25 @@ export class PostgresDatabaseService extends AbstractDatabaseService {
     console.log('Method implementation for Postgres');
   }
 
-  async findAll(table: PostgresEntityMapEnum): Promise<any[]> {
+  async findAll(
+    table: PostgresEntityMapEnum,
+    skip: number,
+    take: number,
+  ): Promise<User[]> {
     const entity = this.getEntity(table);
     const repository = this.dataSource.getRepository(entity);
 
-    return await repository.find();
+    return await repository.find({
+      skip,
+      take,
+    });
+  }
+
+  async count(table: PostgresEntityMapEnum): Promise<number> {
+    const entity = this.getEntity(table);
+    const repository = this.dataSource.getRepository(entity);
+
+    return await repository.count();
   }
 
   private getEntity(table: PostgresEntityMapEnum): EntityClassOrSchema {

@@ -10,13 +10,34 @@ import {
 import { Response } from 'express';
 import { FileService } from './file.service';
 import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiConsumes,
+  ApiBadRequestResponse,
+  ApiInternalServerErrorResponse,
+} from '@nestjs/swagger';
 
+@ApiTags('file')
 @Controller('upload')
 export class FileController {
   constructor(private readonly fileService: FileService) {}
 
   @Post('')
   @UseInterceptors(FileInterceptor('file'))
+  @ApiOperation({ summary: 'Upload a file' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'File uploaded successfully',
+  })
+  @ApiBadRequestResponse({
+    description: 'Bad request - Invalid file or parameters',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal server error - Error during file upload',
+  })
+  @ApiConsumes('multipart/form-data')
   async uploadFile(
     @UploadedFile() file: Express.Multer.File,
     @Res() res: Response,
@@ -36,6 +57,18 @@ export class FileController {
   @UseInterceptors(
     FileInterceptor('file', { limits: { fileSize: 500 * 1024 * 1024 } }),
   )
+  @ApiOperation({ summary: 'Upload a large file' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Large file uploaded successfully',
+  })
+  @ApiBadRequestResponse({
+    description: 'Bad request - Invalid file or parameters',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal server error - Error during large file upload',
+  })
+  @ApiConsumes('multipart/form-data')
   async uploadLargeFile(
     @UploadedFile() file: Express.Multer.File,
     @Res() res: Response,

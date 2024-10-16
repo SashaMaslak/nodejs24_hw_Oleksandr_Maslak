@@ -38,14 +38,28 @@ export class MongoDatabaseService extends AbstractDatabaseService {
     return insertEntity;
   }
 
+  async findAll(table: string, skip?: number, take?: number): Promise<any[]> {
+    const model = this.getModel(MongooseModelsMapEnum.USER);
+
+    const users = await model
+      .find()
+      .skip(skip || 0)
+      .limit(take || 20)
+      .lean();
+
+    console.log(users);
+
+    return users;
+  }
+
+  async count(table: MongooseModelsMapEnum): Promise<number> {
+    const model = this.getModel(table);
+    return model.countDocuments().exec();
+  }
+
   async findOne(table: MongooseModelsMapEnum, query: any): Promise<any> {
     const model = this.getModel(table);
     return model.findOne(query).lean();
-  }
-
-  async findAll(table: MongooseModelsMapEnum): Promise<any[]> {
-    const model = this.getModel(table);
-    return model.find().lean().exec();
   }
 
   async remove(table: MongooseModelsMapEnum, id: string): Promise<any> {

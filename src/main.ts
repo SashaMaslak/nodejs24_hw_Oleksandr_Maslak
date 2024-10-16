@@ -19,7 +19,6 @@ async function bootstrap() {
 
   app.enableShutdownHooks();
 
-
   const configService = app.get(ConfigService);
 
   if (configService.get<string>('application.NODE_ENV') !== 'production') {
@@ -35,6 +34,5 @@ async function bootstrap() {
   }
 
   await app.listen(configService.get<number>('application.port'));
-
 }
 bootstrap();
