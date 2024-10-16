@@ -8,6 +8,7 @@ import {
   Put,
   UseGuards,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -21,8 +22,9 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { PartialUpdateUserDto } from './dto/partial-update-user.dto';
 import { User } from 'src/database-abstraction/models/user.model';
 import { UserDto } from './dto/user.dto';
-import { GetUsersListDto } from './dto/get-users-list.dto';
+import { GetPaginatedList } from 'src/common/dto/get-paginated-list.dto';
 import { ErrorModelDto } from 'src/common/dto/error-model.dto';
+import { PaginationResponse } from 'src/common/dto/pagination-response.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -32,7 +34,7 @@ export class UsersController {
   @Get()
   @ApiOperation({ summary: 'Get all users' })
   @ApiOkResponse({
-    type: GetUsersListDto,
+    type: PaginationResponse<User>,
     description: 'List of users successfully retrieved',
   })
   @ApiResponse({
@@ -40,8 +42,17 @@ export class UsersController {
     type: ErrorModelDto,
     description: 'Error during the request',
   })
-  async getAll(): Promise<User[]> {
-    return this.usersService.findAll();
+  async getAll(
+    @Query() paginationParams: GetPaginatedList,
+  ): Promise<PaginationResponse<User>> {
+    const users = await this.usersService.findAll(paginationParams);
+    const total = await this.usersService.count();
+
+    return {
+      data: users,
+      skip: paginationParams.skip,
+      total: total,
+    };
   }
 
   @Get(':id')

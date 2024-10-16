@@ -6,7 +6,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { User } from 'src/database-abstraction/models/user.model';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PartialUpdateUserDto } from './dto/partial-update-user.dto';
-import { GetUserDto } from './dto/get-user.dto';
+import { GetPaginatedList } from 'src/common/dto/get-paginated-list.dto';
 
 @Injectable()
 export class UsersService {
@@ -34,11 +34,21 @@ export class UsersService {
     this.logger.log('User created successfully.');
   }
 
-  async findAll(): Promise<User[]> {
-    this.logger.log('Fetching all users.');
-    const users = await this.dbService.findAll(MongooseModelsMapEnum.USER);
+  async findAll(paginationParams: GetPaginatedList): Promise<User[]> {
+    const { skip, take } = paginationParams;
+    this.logger.log(`Fetching all users, skip: ${skip}, take: ${take}`);
+    const users = await this.dbService.findAll(
+      MongooseModelsMapEnum.USER,
+      skip,
+      take,
+    );
     this.logger.log(`Fetched ${users.length} users.`);
     return users;
+  }
+
+  async count(): Promise<number> {
+    this.logger.log('Counting total users.');
+    return await this.dbService.count(MongooseModelsMapEnum.USER);
   }
 
   async remove(id: string): Promise<User> {

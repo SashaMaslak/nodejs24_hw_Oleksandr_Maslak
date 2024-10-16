@@ -5,10 +5,11 @@ export interface IAbstractDatabaseService {
   disconnect(): Promise<void>;
   insertOne(table: string, data: any): Promise<User>;
   findOne(table: string, query: any): Promise<any>;
-  findAll(table: any): Promise<any[]>;
+  findAll(table: string, skip?: number, take?: number): Promise<User[]>;
   remove(table: string, id: string): Promise<any>;
   findById(table: string, id: string): Promise<any>;
   findByEmail(table: string, email: string): Promise<any | null>;
   findByIdAndReplace(table: string, id: string, dto: any): Promise<any>;
   findByIdAndUpdate(table: string, id: string, dto: any): Promise<any>;
+  count(table: string): Promise<number>;
 }
