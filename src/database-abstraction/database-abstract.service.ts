@@ -8,7 +8,11 @@ export abstract class AbstractDatabaseService
   abstract disconnect(): Promise<void>;
   abstract insertOne(table: string, data: any): Promise<User>;
   abstract findOne(table: string, query: any): Promise<any>;
-  abstract findAll(table: any): Promise<any[]>;
+  abstract findAll(
+    table: string,
+    skip?: number,
+    take?: number,
+  ): Promise<User[]>;
   abstract remove(table: string, id: string): Promise<any>;
   abstract findById(table: string, id: string): Promise<any>;
   abstract findByEmail(table: string, email: string): Promise<any | null>;
@@ -18,4 +22,5 @@ export abstract class AbstractDatabaseService
     dto: any,
   ): Promise<any>;
   abstract findByIdAndUpdate(table: string, id: string, dto: any): Promise<any>;
+  abstract count(table: string): Promise<number>;
 }

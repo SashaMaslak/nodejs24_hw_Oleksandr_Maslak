@@ -15,7 +15,7 @@ export class GetPaginatedList {
   @Min(1)
   @Max(50)
   @ApiPropertyOptional({ default: 20, maximum: 50 })
-  take = 20;
+  take = 3;
 }
 
 export enum Order {
