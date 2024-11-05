@@ -1,10 +1,6 @@
 # compiled output
 /dist
 /node_modules
-/microservices/http/consumer/node_modules
-/microservices/http/producer/node_modules
-/microservices/queue/consumer/node_modules
-/microservices/queue/producer/node_modules
 /db-data
 
 # Logs
