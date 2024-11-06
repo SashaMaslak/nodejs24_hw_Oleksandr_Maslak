@@ -163,7 +163,7 @@ jobs:
               echo "    image: ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.DOCKERHUB_DIR }}:latest" >> "$DOCKER_COMPOSE_FILE"
               echo "    container_name: myapp-container" >> "$DOCKER_COMPOSE_FILE"
               echo "    ports:" >> "$DOCKER_COMPOSE_FILE"
-              echo "      - \"8080:${PORT}\"  # Map the port defined in .env" >> "$DOCKER_COMPOSE_FILE"
+              echo "      - \"8088:${PORT}\"  # Map the port defined in .env" >> "$DOCKER_COMPOSE_FILE"
               echo "    env_file:" >> "$DOCKER_COMPOSE_FILE"
               echo "      - .env" >> "$DOCKER_COMPOSE_FILE"
               echo "    restart: unless-stopped" >> "$DOCKER_COMPOSE_FILE"
