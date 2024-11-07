@@ -18,20 +18,19 @@ jobs:
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
       - name: Build Docker image
-        run: docker build --no-cache -t myapp:latest .
+        run: docker build --no-cache -t app:latest .
 
       - name: Tag Docker image
-        run: docker tag myapp:latest ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.DOCKERHUB_DIR }}:latest
+        run: docker tag app:latest ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.DOCKERHUB_DIR }}:latest
 
       - name: Push Docker image to Docker Hub
         run: docker push ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.DOCKERHUB_DIR }}:latest
-
 
   create-env:
     runs-on: ubuntu-latest
     needs: build
     environment: dev # secrets environment
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -42,10 +41,10 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          script: |            
+          script: |
             # Define your environment file path
             ENV_FILE=".env"
-        
+
             # Assign GitHub variables to shell variables
             NODE_ENV="${{ vars.NODE_ENV }}"
             PORT="${{ vars.PORT }}"
@@ -61,7 +60,7 @@ jobs:
             MONGO_EXPRESS_USERNAME="${{ secrets.MONGO_EXPRESS_USERNAME }}"
             MONGO_EXPRESS_PASSWORD="${{ secrets.MONGO_EXPRESS_PASSWORD }}"
             MONGO_URI="${{ secrets.MONGO_URI }}"
-        
+
             # Create .env file if it doesn't exist
             if [ ! -f "$ENV_FILE" ]; then
               echo "Creating .env file..."
@@ -84,12 +83,12 @@ jobs:
               echo "MONGO_EXPRESS_USERNAME=$MONGO_EXPRESS_USERNAME" >> "$ENV_FILE"
               echo "MONGO_EXPRESS_PASSWORD=$MONGO_EXPRESS_PASSWORD" >> "$ENV_FILE"
               echo "MONGO_URI=$MONGO_URI" >> "$ENV_FILE"
-        
+
               echo ".env file created successfully."
             else
               echo ".env file already exists."
             fi
-          
+
             # Show .env file content if it exists
             if [ -f ".env" ]; then
               echo ".env file is there"
@@ -101,7 +100,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: create-env
     environment: dev
-    
+
     steps:
       - name: Connect to EC2 instance
         uses: appleboy/ssh-action@v1.0.3
@@ -109,7 +108,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-        
+
       - name: Install Git + Docker + Docker-Compose to EC2 instance if not installed
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -122,25 +121,24 @@ jobs:
               sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
               sudo chmod +x /usr/local/bin/docker-compose
             fi
-            
+
             # Install Git if not already installed
             if ! command -v git &> /dev/null; then
               sudo yum install -y git  # For Amazon Linux and RHEL-based distros
               # OR use the following for Ubuntu-based distros
               # sudo apt-get update && sudo apt-get install -y git
             fi
-            
+
             # Verify installations
             docker --version
             docker-compose --version
             git --version
 
-
   create-docker-compose-file:
     runs-on: ubuntu-latest
     needs: set-up-git-and-docker
     environment: dev
-    
+
     steps:
       - name: Connect to EC2 instance
         uses: appleboy/ssh-action@v1.0.3
@@ -156,63 +154,62 @@ jobs:
             if [ ! -f "$DOCKER_COMPOSE_FILE" ]; then
               echo "Creating $DOCKER_COMPOSE_FILE..."
               touch "$DOCKER_COMPOSE_FILE"
-            
+
               # Create the docker-compose.yml file with the specified content
               echo "version: '3.8'" > "$DOCKER_COMPOSE_FILE"
               echo "" >> "$DOCKER_COMPOSE_FILE"
               echo "services:" >> "$DOCKER_COMPOSE_FILE"
-              echo "  myapp:" >> "$DOCKER_COMPOSE_FILE"
+              echo "  app:" >> "$DOCKER_COMPOSE_FILE"
               echo "    image: ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.DOCKERHUB_DIR }}:latest" >> "$DOCKER_COMPOSE_FILE"
-              echo "    container_name: myapp-container" >> "$DOCKER_COMPOSE_FILE"
+              echo "    container_name: app-container" >> "$DOCKER_COMPOSE_FILE"
               echo "    ports:" >> "$DOCKER_COMPOSE_FILE"
               echo "      - \"8080:${PORT}\"  # Map the port defined in .env" >> "$DOCKER_COMPOSE_FILE"
               echo "    env_file:" >> "$DOCKER_COMPOSE_FILE"
               echo "      - .env" >> "$DOCKER_COMPOSE_FILE"
               echo "    restart: unless-stopped" >> "$DOCKER_COMPOSE_FILE"
-            
+
               echo "$DOCKER_COMPOSE_FILE created successfully."
             else
               echo "$DOCKER_COMPOSE_FILE already exists."
             fi
-            
-            
+
   run-image:
     runs-on: ubuntu-latest
     needs: create-docker-compose-file
     environment: dev
 
     steps:
-    - name: Connect to EC2 instance and run commands
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USER }}
-        key: ${{ secrets.EC2_SSH_KEY }}
-        script: |
-          # Stop and remove existing containers
-          sudo docker-compose down 
+      - name: Connect to EC2 instance and run commands
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # Stop and remove existing containers
+            sudo docker-compose down 
 
-          # Remove all stopped containers
-          # Check if docker-compose.yml exists
-          if [ -f "docker-compose.yml" ]; then
-              echo "Stopping and removing containers, networks, and volumes..."
-              sudo docker-compose down --volumes
-          else
-              echo "docker-compose.yml not found in the current directory."
-          fi
-          
-          # Remove all images
-          echo "Removing all Docker images..."
-          sudo docker rmi $(sudo docker images -q) || echo "No images to remove."
-          
-          # Build the Docker images
-          echo "Building the Docker images..."
-          sudo docker-compose build --no-cache  # Build the latest Docker images
+            # Remove all stopped containers
+            # Check if docker-compose.yml exists
+            if [ -f "docker-compose.yml" ]; then
+                echo "Stopping and removing containers, networks, and volumes..."
+                sudo docker-compose down --volumes
+            else
+                echo "docker-compose.yml not found in the current directory."
+            fi
 
-          # Restart the app with Docker
-          echo "Starting the app with Docker..."
-          sudo docker-compose up -d
-  
-          # Check running containers
-          echo "Listing running containers..."
-          sudo docker ps
+            # Remove all images
+            echo "Removing all Docker images..."
+            sudo docker rmi $(sudo docker images -q) || echo "No images to remove."
+
+            # Build the Docker images
+            echo "Building the Docker images..."
+            sudo docker-compose build --no-cache  # Build the latest Docker images
+
+            # Restart the app with Docker
+            echo "Starting the app with Docker..."
+            sudo docker-compose up -d
+
+            # Check running containers
+            echo "Listing running containers..."
+            sudo docker ps
