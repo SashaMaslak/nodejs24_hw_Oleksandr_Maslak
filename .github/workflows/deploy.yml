@@ -26,6 +26,7 @@ jobs:
 
       - name: Build Docker image
         run: |
+          cd app
           docker build -t ${{ secrets.DOCKERHUB_DIR }} .
 
       - name: Push Docker image to Docker Hub
@@ -43,15 +44,8 @@ jobs:
       - name: SSH into EC2 and deploy Docker Compose
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-            # Оновлення репозиторію та налаштування Docker Compose на EC2
             cd ~/my-app-directory || exit 1
-
-            # Отримуємо останні зміни
             git pull origin main
-
-            # Перевіряємо, чи є необхідні оновлення образів Docker
             docker-compose pull
-
-            # Перезапускаємо сервіси
             docker-compose up -d --build
           EOF
