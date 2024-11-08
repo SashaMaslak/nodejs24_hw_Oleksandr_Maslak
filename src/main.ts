@@ -21,6 +21,12 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
 
+  const port = Number(configService.get<string>('PORT'));
+
+  if (isNaN(port)) {
+    throw new Error('PORT must be a valid number');
+  }
+
   if (configService.get<string>('application.NODE_ENV') !== 'production') {
     const docConfig = new DocumentBuilder()
       .addBearerAuth()
@@ -33,6 +39,6 @@ async function bootstrap() {
     SwaggerModule.setup('docs', app, document);
   }
 
-  await app.listen(configService.get<number>('PORT'));
+  await app.listen(port);
 }
 bootstrap();
