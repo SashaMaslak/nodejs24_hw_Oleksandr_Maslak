@@ -44,7 +44,7 @@ jobs:
           script: |
             ENV_FILE=".env"
             NODE_ENV="${{ vars.NODE_ENV }}"
-            PORT="${{ vars.PORT }}"
+            PORT="${{ secrets.PORT }}"
             THROTTLE_LIMIT="${{ vars.THROTTLE_LIMIT }}"
             THROTTLE_TTL="${{ vars.THROTTLE_TTL }}"
             POSTGRES_USER="${{ secrets.POSTGRES_USER }}"

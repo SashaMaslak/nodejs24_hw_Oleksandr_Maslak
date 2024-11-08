@@ -22,7 +22,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - '3100:3100'
+      - ${PORT}:${PORT}
     depends_on:
       postgresdb:
         condition: service_healthy
@@ -46,7 +46,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     ports:
-      - '27017:27017'
+      - 27017:27017
     networks:
       - mongodb_network
 
